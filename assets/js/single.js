@@ -1,14 +1,17 @@
 var issueContainerEl = document.querySelector("#issues-container")
 var limitWarningEl = document.querySelector("#limit-warning");
+var repoNameEl = document.querySelector("#repo-name");
 
 var getRepoIssues = function(repo) {
-    var apiUrl = "https://api.github.com/repos/" + repo + "/issues?direction=asc";
+    console.log(repo);
+    var apiUrl = 'https://api.github.com/repos/' + repo + '/issues?direction=asc' ;
     
     fetch(apiUrl).then(function(response) {
         //request successful 
         if (response.ok) {
             response.json().then(function(data) {
                 displayIssues(data);
+             
 
         //check if api has paginated issues 
         if (response.headers.get("Link")) {
@@ -17,15 +20,25 @@ var getRepoIssues = function(repo) {
             });
         }
         else {
-            console.log(response);
-            alert("There was a problem with your request!");
+           document.location.replace("./index.html");
         }
     });
 };
 
-getRepoIssues("bridgetvon");
+var getRepoName = function(){
+var queryString = document.location.search;
+var repoName = queryString.split("=")[1];
+ if(repoName) {getRepoIssues(repoName);
+repoNameEl.textContent = repoName;
+
+getRepoIssues(repoName);
+} else {
+    document.location.replace("./index.html");
+}
+};
 
 var displayIssues = function(issues) {
+    console.log(issues);
 if (issues.length === 0){
     issueContainerEl.textContent = "This repo has no issues!";
     return;
@@ -37,7 +50,7 @@ for (var i = 0; i < issues.length; i++) {
     issueEl.setAttribute("href", issues[i].html_url);
     issueEl.setAttribute("target", "_blank");
     issueEl.appendChild(issueEl);
-    }
+    };
     //create a span to hold issue title 
     var titleEl = document.createElement("span"); 
     titleEl.textContent = issues[i].title;
@@ -60,6 +73,7 @@ for (var i = 0; i < issues.length; i++) {
 
 var displayWarning = function(repo) {
     //add text to warning container
+    console.log("warning repo", repo);
     limitWarningEl.textContent = "To see more than 30 issues, visit ";
     var linkEl = document.createElement("a");
     linkEl.textContent = "See More Issues on Github.com";
@@ -70,3 +84,6 @@ var displayWarning = function(repo) {
     limitWarningEl.appendChild(linkEl);
 
 };
+
+
+getRepoName();
